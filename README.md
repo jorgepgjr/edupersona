@@ -19,8 +19,7 @@ Siga os passos abaixo para configurar e executar o projeto:
 
 3.  **Instale as dependências:**
     ```bash
-    pip install spade
-    pip install spade_llm
+    pip install -r requirements.txt
     ```
 
 4.  **Inicie o servidor XMPP:**
