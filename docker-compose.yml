@@ -1,0 +1,17 @@
+services:
+  db:
+    image: mysql:8.0 # You can specify a different MySQL version if needed
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: your_root_password # Replace with a strong password
+      MYSQL_DATABASE: your_database_name # Optional: Create a default database
+      MYSQL_USER: your_user # Optional: Create a default user
+      MYSQL_PASSWORD: your_user_password # Optional: Set password for the default user
+    volumes:
+      - ./devops/mysql/mysql_data:/var/lib/mysql # Persist MySQL data
+      - ./devops/mysql/scripts-carga:/docker-entrypoint-initdb.d # Load data of database
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080 # Access Adminer on http://localhost:8080
