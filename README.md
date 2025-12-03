@@ -26,8 +26,16 @@ Siga os passos abaixo para configurar e executar o projeto:
     ```bash
     spade run
     ```
+5.  **Inicie o banco de dados:**
+    docker compose up
 
-5.  **Execute o agente:**
+6.  **Execute os agentes:**
     ```bash
-    python simple-agent.py
+    python src/main.py
     ```
+
+7.  **Execute o agente de comunicação:**
+    ```bash
+    python src/agents/comunication.py
+    ```
+
