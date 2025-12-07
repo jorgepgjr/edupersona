@@ -4,14 +4,16 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: your_root_password # Replace with a strong password
-      MYSQL_DATABASE: your_database_name # Optional: Create a default database
-      MYSQL_USER: your_user # Optional: Create a default user
-      MYSQL_PASSWORD: your_user_password # Optional: Set password for the default user
+      MYSQL_DATABASE: edupersona # Optional: Create a default database
+      MYSQL_USER: user # Optional: Create a default user
+      MYSQL_PASSWORD: pass # Optional: Set password for the default user
     volumes:
       - ./devops/mysql/mysql_data:/var/lib/mysql # Persist MySQL data
       - ./devops/mysql/scripts-carga:/docker-entrypoint-initdb.d # Load data of database
+    ports:
+      - 3306:3306
   adminer:
     image: adminer
     restart: always
     ports:
-      - 8080:8080 # Access Adminer on http://localhost:8080
+      - 8090:8080 # Access Adminer on http://localhost:8080
