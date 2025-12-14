@@ -1,4 +1,3 @@
 spade
 spade_llm
-pandas
 mysql-connector-python

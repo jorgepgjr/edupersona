@@ -34,7 +34,7 @@ DB_USER = 'user' # Altere para seu usuário MySQL
 DB_PASSWORD = 'pass' # Altere para sua senha MySQL
 
 # 2. INFORMAÇÕES DO ARQUIVO COM OS OBJETOS DE APRENDIZAGEM
-NOME_ARQUIVO = 'adm-educacional/objetos-de-aprendizagem/oa.csv'
+NOME_ARQUIVO = './adm-educacional/objetos-de-aprendizagem/oa.csv'
 
 # 3. PROMPTS DOS AGENTES
 COMUNICATING_PROMPT = """Você é um agente de interface para interação em uma ferramenta de apoio pedagógico.
@@ -167,7 +167,7 @@ async def get_disciplines(matricula: int) -> list:
         conexao.close()
         print("\n✔️ Conexão fechada.")
 
-async def get_oa(disciplinas: list) -> list:
+async def get_oa() -> list:
   """Retorna os objetos de aprendizagem disponíveis"""
   if not os.path.exists(NOME_ARQUIVO):
       print(f"❌ Erro: O arquivo '{NOME_ARQUIVO}' não foi encontrado no diretório atual.")
@@ -175,7 +175,7 @@ async def get_oa(disciplinas: list) -> list:
   else:
       try:
           with open(NOME_ARQUIVO,mode='r',encoding='utf-8') as arquivo_csv:
-              leitor_csv = csv.reader(arquivo_csv)
+              leitor_csv = arquivo_csv.readlines()
               return leitor_csv
       except Exception as e:
           print(f"❌ Ocorreu um erro inesperado: {e}")
@@ -204,11 +204,19 @@ async def main():
 
     # Create an LLM provider
   # Ollama (local)
-  provider = LLMProvider.create_ollama(
-    model="llama3.1:8b",
+  
+  #provider = LLMProvider.create_ollama(
+  #  model="llama3.1:8b",
     #model="gemma3:1b",
-    base_url="http://localhost:11434/v1",
-    timeout=180.0
+  #  base_url="http://localhost:11434/v1",
+  #  timeout=180.0
+  #)
+  
+
+  provider = LLMProvider.create_openai(
+    api_key="YOUR_OPENAI_API_KEY",
+    model="gpt-4o-mini",
+    temperature=0.7
   )
   
   input_guardrails = [ComunicatingOnlyGuardrail()]
@@ -222,7 +230,7 @@ async def main():
     parameters={
         "type": "object",
         "properties": {
-          "matricula": {"type": "int", "description": "matricula do aluno"}
+          "matricula": {"type": "integer", "description": "matricula do aluno"}
         },
         "required": ["matricula"]
     },
@@ -234,10 +242,11 @@ async def main():
     description="Recupera os objetos de aprendizagem presentes na base de dados",
     parameters={
         "type": "object",
-        "properties": {
-           "disciplinas": {"type": "list", "description": "lista de disciplinas passadas para retornar os oa"}
-        },
-        "required": ["disciplinas"]
+        "properties": {},
+   #     "properties": {
+   #        "disciplinas": {"type": "integer", "description": "lista de disciplinas passadas para retornar os oa"}
+   #     },
+   #     "required": ["disciplinas"]
     },
     func=get_oa
   )
@@ -250,6 +259,7 @@ async def main():
     password=passwords["tutor"],
     provider=provider,
     tools=[consulta_oa],
+    reply_to=agents_config["human"][0],
     #system_prompt="Faça uma recomendação de estudo"
     system_prompt=TUTOR_PROMPT,
   )
@@ -284,8 +294,11 @@ async def main():
   try:
      # Start all agents
     print("\n🚀 Starting all agents...")
+    porta_inicial = 10000
     for name, agent in agents.items():
       await agent.start()
+      agent.web.start(hostname="127.0.0.1", port=str(porta_inicial))
+      porta_inicial += 1
       print(f"✅ {name.capitalize()} agent started")
 
     print("\n" + "=" * 70)
