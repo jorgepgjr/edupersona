@@ -22,6 +22,7 @@ import mysql.connector
 from mysql.connector import Error
 
 from spade_llm.agent import LLMAgent, ChatAgent
+from spade_llm.routing import RoutingResponse
 from spade_llm.providers import LLMProvider
 from spade_llm.tools import LLMTool
 from spade_llm.guardrails.base import Guardrail, GuardrailResult, GuardrailAction
@@ -38,15 +39,21 @@ NOME_ARQUIVO = './adm-educacional/objetos-de-aprendizagem/oa.csv'
 
 # 3. PROMPTS DOS AGENTES
 COMUNICATING_PROMPT = """Você é um agente de interface para interação em uma ferramenta de apoio pedagógico.
-Todas as mensagens do usuário devem ser redirecionadas para o avaliador de desempenho e todas as respostas
-devem ser redirecionadas para o usuário com clareza, de forma educada e buscando motivar o usuário a 
+As mensagens do usuário podem ser redirecionadas para dois agentes possíveis.
+Se o usuário perguntar sobre avaliação, desempenho, estudo ou aprendizado deverá ser direcionado ao agente avaliador de desempenho.
+Se o usuário perguntar sobre recomendação de objetos de aprendizagem, deverá ser direcionado ao agente tutor.
+Todas as respostas devem ser redirecionadas para o usuário com clareza, de forma educada e buscando motivar o usuário a 
 proseguir em seus estudos.
 
 Seu fluxo de trabalho:
-1. Identifique qual a matrícula do aluno para que seja avaliado seu desempenho (pergunte ao usuário se não for especificado)
-2. Use a Tool de consulta de desempenho para recuperar os dados
+1. Identifique se a pergunta é sobre desempenho escolar ou recomendação de objetos de aprendizagem.
+2. Se for sobre o desempenho escolar, identifique qual a matrícula do aluno para que seja avaliado seu desempenho (pergunte ao usuário se não for especificado).
+  2.1 Use a Tool de consulta de desempenho para recuperar os dados
+3. Se for sobre recomendação de objetos de aprendizagem, identifique sobre qual disciplina o usuário deseja recomendação.
 
 Formato de resposta:
+<<Para perguntas sobre desempenho escolar>>
+<EVALUATING_PROMPT>
 === DESEMPENHO DO ALUNO DE MATRÍCULA: [MATRICULA] ===
 
 Nome do aluno: [name]
@@ -55,6 +62,23 @@ Disciplinas:
 Notas nas atividades:
 [lista com o nome das disciplinas, Tipo, Peso, ValorNota e Frequencia]
 
+<<Para perguntas sobre objetos de aprendizagem>>
+<TUTOR_PROMPT>
+=== RECOMENDAÇÃO DE OBJETOS DE APRENDIZAGEM PARA DISCIPLINA: [DISCIPLINA] ===
+Nome da disciplina:
+Lista de tipos de objetos de aprendizagem que agradam o usuário:
+[Identifique pela mensagem do usuário o tipo de objeto de aprendizagem que ele prefere, como:
+- Documento
+- Estudo de Caso
+- Exemplo de Código
+- Fórum
+- Infográfico
+- Jogo
+- Laboratório
+- Quiz
+- Simulação
+- Vídeo
+]
 """
 
 EVALUATING_PROMPT= """Você é um especialista pedagógico. Você recebe um conjunto de informações
@@ -83,9 +107,9 @@ Lista de disciplinas que precisa de Objetos de Aprendizagem:
 TUTOR_PROMPT = """
 
 Seu fluxo de trabalho:
-1. Receba os dados completos da avaliação do aluno do Evaluating agent.
+1. Receba os dados completos da avaliação do aluno do Evaluating agent ou a solicitação de um objeto de aprendizagem do Comunicating agent.
 2. Use a Tool de consulta de oa para recuperar a lista de Objetos de Aprendizagem disponíveis na instituição
-3. Escreva um relatório apontando os objetos de aprendizado selecionados, baseado na lista recebida pelo evaluationg agent
+3. Escreva um relatório apontando os objetos de aprendizado selecionados, baseado na lista recebida pelo evaluationg agent ou do comunicating agent.
 4. Adicione no fim da resposta recebida do agente anterior, o relatório produzido.
 
 Importante:
@@ -94,10 +118,15 @@ Importante:
 - Faça uma breve descrição sobre cada objeto de aprendizagem recomendado.
 
 Formato da resposta:
+<<Para perguntas sobre desempenho escolar>>
 === AVALIAÇÃO DO ALUNO ===
 Situação: [situação]
 Estratégia: [estrategia]
 Lista de Objetos de Aprendizagem:
+[lista com nome do Objeto de aprendizagem - breve descrição do que se trata - porque foi recomendado]
+
+<<Para perguntas sobre objetos de aprendizagem>>
+=== RECOMENDAÇÃO DE OBJETOS DE APRENDIZAGEM PARA DISCIPLINA: [DISCIPLINA] ===
 [lista com nome do Objeto de aprendizagem - breve descrição do que se trata - porque foi recomendado]
 """
 
@@ -108,7 +137,9 @@ class ComunicatingOnlyGuardrail(Guardrail):
         super().__init__(name, enabled, "Eu apenas ajudo com questões relativas a desempenho escolar. Por favor me pergunte sobre seu desempenho no período, o que você pode melhorar, onde deve ter atenção.")
         self.comunicating_keywords = [
             "desempenho", "nota", "melhorar", "recomendação de material", "frequência", 
-            "aprovação", "estudos", "aprendizado", "atividades", "provas"
+            "aprovação", "estudos", "aprendizado", "atividades", "provas",
+            "objetos de aprendizagem", "disciplina", "conteúdo", "videoaula", "estudo de caso",
+            "quiz", "simulação", "laboratório", "infográfico", "jogo"
         ]
     
     async def check(self, content: str, context: Dict[str, Any]) -> GuardrailResult:
@@ -180,6 +211,17 @@ async def get_oa() -> list:
       except Exception as e:
           print(f"❌ Ocorreu um erro inesperado: {e}")
 
+def review_router(msg, response, context):
+    """Rotas para identificar se o caminho será para avaliação do aluno ou para recomendação de objetos de aprendizagem"""
+    response_upper = response.upper()
+
+    domain = str(msg.sender).split('@')[1]
+
+    if "<TUTOR_PROMPT>" in response_upper:
+        return RoutingResponse(recipients=[f"tutor@{domain}"])
+    else:
+        return RoutingResponse(recipients=[f"evaluating@{domain}"])
+
 
 async def main():
 
@@ -214,7 +256,7 @@ async def main():
   
 
   provider = LLMProvider.create_openai(
-    api_key="YOUR_OPENAI_API_KEY",
+    api_key="<OPENAI_API_KEY>",
     model="gpt-4o-mini",
     temperature=0.7
   )
@@ -278,6 +320,7 @@ async def main():
     password=passwords["comunicating"],
     provider=provider,
     input_guardrails=input_guardrails,
+    routing_function=review_router,
     tools=[consulta_notas],
     reply_to=agents_config["evaluating"][0],
     #system_prompt="Se comunique de forma clara e pegue a matrícula"
