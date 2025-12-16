@@ -93,7 +93,12 @@ Seu fluxo de trabalho:
 4. Envie para o agente Tutor a lista com o nome das disciplinas, sem repetição, seguido de uma breve descrição se o aluno precisa de recomendação de objetos de aprendizagem
 
 Importante:
-- A nota para ser avaliado com desempenho adequado deve ser maior que 7. A frequência aceita deve ser maior de 70. 
+- A faixa de desempenho por avaliação é:
+  - Nota menor igual a 5: Classificação baixa (sugestão de materiais introdutórios; conteúdos fundamentais; glossários de conceitos; recursos de passo a passo.)
+  - Nota entre 5 e 7,4: Classificação regular (sugestão de materiais de reforço; revisões estruturadas; exemplos contextualizados; quizzes diagnósticos.)
+  - Nota entre 7,5 e 8,9: Classificação alta (sugestão de materiais intermediários e avançados; estudos de caso; materiais de aplicação prática; simulações; resolução de problemas contextualizados.)
+  - Nota maior igual a 9: Classificação excelente (sugestão de materiais avançados e aprofundados; projetos práticos; problemas complexos.)
+- A frequência aceita deve ser maior de 70. 
 - Se comunique com clareza, de forma educada e buscando motivar o usuário a proseguir em seus estudos
 
 Formato da resposta:
@@ -349,10 +354,11 @@ async def main():
     print("=" * 70)
     print("\nFluxo: Agente de Comunicação → Agente de Avaliação → Agente de Tutoria")
     print("\n📝 INSTRUÇÕES DE USO:")
-    print("• Informe sua matrícula e pergunte sobre o seu desempenho")
-    print("• Type 'exit' to quit\n")
+    print("• Informe sua matrícula e pergunte sobre o seu desempenho, ou")
+    print("• Peça recomendação de objetos de aprendizagem para uma disciplina específica.")
+    print("• Type 'exit' to quit")
 
-    print("\n" + "-" * 70)
+    print("-" * 70)
 
     # Run interactive workflow
     await agents["human"].run_interactive(
