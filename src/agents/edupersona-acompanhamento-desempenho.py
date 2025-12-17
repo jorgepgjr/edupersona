@@ -139,7 +139,7 @@ class ComunicatingOnlyGuardrail(Guardrail):
     """Guardrail com estrutura que permitirão perguntas ao sistema."""
     
     def __init__(self, name: str = "chat_only_filter", enabled: bool = True):
-        super().__init__(name, enabled, "Eu apenas ajudo com questões relativas a desempenho escolar. Por favor me pergunte sobre seu desempenho no período, o que você pode melhorar, onde deve ter atenção.")
+        super().__init__(name, enabled, "Não posso lhe ajudar com essa questão. O sistema se propõe a realizar buscas de materiais didáticos e/ou conteúdos que possam lhe ajudar no seu processo de aprendizagem. Faça uma nova pergunta.")
         self.comunicating_keywords = [
             "desempenho", "nota", "melhorar", "recomendação de material", "frequência", 
             "aprovação", "estudos", "aprendizado", "atividades", "provas",

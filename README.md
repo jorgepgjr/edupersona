@@ -6,7 +6,7 @@ Este projeto utiliza o framework [SPADE](https://spadeagents.eu/) para criar um 
 
 O sistema oferece uma avaliação do desempenho acadêmico de alunos em uma instituição de ensino fictícia.
 
-O aluno interage com um chat explicando qual avaliação deseja receber, o sistema, por meio de agentes, realiza a avaliação e recomenda objetos de aprendizagem para o aprimoramento e evolução do aluno.
+O aluno interage com um chat informando sua matrícula e o que deseja, o sistema, por meio de agentes, realiza o diagnóstico do aluno e recomenda objetos de aprendizagem para o aprimoramento e evolução do aluno.
 
 O aluno também pode interagir com o chat buscando objetos de aprendizagem para adquirir materias para aprofundamento em disciplinas de seu interesse.
 
