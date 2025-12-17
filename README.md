@@ -4,6 +4,12 @@
 
 Este projeto utiliza o framework [SPADE](https://spadeagents.eu/) para criar um sistema multiagente que oferece orientação personalizada para alunos através de um chat inteligente.
 
+O sistema oferece uma avaliação do desempenho acadêmico de alunos em uma instituição de ensino fictícia.
+
+O aluno interage com um chat explicando qual avaliação deseja receber, o sistema, por meio de agentes, realiza a avaliação e recomenda objetos de aprendizagem para o aprimoramento e evolução do aluno.
+
+O aluno também pode interagir com o chat buscando objetos de aprendizagem para adquirir materias para aprofundamento em disciplinas de seu interesse.
+
 ## Ferramentas
 
 - Python
@@ -73,3 +79,5 @@ Siga os passos abaixo para configurar e executar o projeto:
     ```bash
     python src/agent/edupersona-acompanhamento-desempenho.py
     ```
+
+    A aplicação está executando, agora é só interagir com o chat.
