@@ -10,22 +10,33 @@ O aluno interage com um chat informando sua matrícula e o que deseja, o sistema
 
 O aluno também pode interagir com o chat buscando objetos de aprendizagem para adquirir materias para aprofundamento em disciplinas de seu interesse.
 
+## Estrutura de pastas
+Veja mais detalhes na [Estrutura de Pastas](Estrutura.MD).
+
 ## Ferramentas
 
 - Python
 - Docker
 - OpenAI
 
-## Orientação da Instalação das Ferramentas
+# Orientação da Instalação das Ferramentas
 
 - Python - [Getting Started](https://www.python.org/about/gettingstarted/)
 - Docker - [Instalação do Docker](https://docs.docker.com/manuals/)
 - OpenAI - [Geração da API Key na OpenAI](https://hub.asimov.academy/tutorial/como-gerar-uma-api-key-na-openai/)
 
+## Instalação do Python 3.12.10
+1. Acesse o link oficial: [Python 3.12.10](https://www.python.org/ftp/python/3.12.10/python-3.12.10-macos11.pkg)
+2. Execute o instalador `.pkg` e siga as instruções na tela.
+
+## Instalação do Docker via Homebrew
+Abra o seu terminal e utilize o comando abaixo para instalar o Docker Desktop de forma rápida:
+
+```bash
+brew install docker
+```
+
 ## Configuração da Aplicação
-
-Siga os passos abaixo para configurar e executar o projeto:
-
 1.  **Crie um ambiente virtual (venv) com Python 3.12:**
 
     ```bash
@@ -44,7 +55,7 @@ Siga os passos abaixo para configurar e executar o projeto:
     pip install -r requirements.txt
     ```
 
-    **Adição da API Key na OpenAI na Aplicação**
+4.  **Adição da API Key na OpenAI na Aplicação**
 
     Acessar o arquivo `src/agent/edupersona-acompanhamento-desempenho.py`, procurar o trecho de código abaixo e adicionar sua chave no parâmetro `api_key`
 
@@ -58,13 +69,15 @@ Siga os passos abaixo para configurar e executar o projeto:
 
 ## Execução
 
-4.  **Inicie o servidor XMPP:**
+Vamos usar um terminal para cada um dos passos abaixo.
+
+1.  **Inicie o servidor XMPP:**
 
     ```bash
     spade run
     ```
 
-5.  **Inicie o banco de dados:**
+2.  **Inicie o banco de dados:**
 
     Em um novo terminal, execute:
 
@@ -72,7 +85,7 @@ Siga os passos abaixo para configurar e executar o projeto:
     docker compose up
     ```
 
-6.  **Execute os agentes:**
+3.  **Execute os agentes:**
 
     Em um novo terminal, execute:
 

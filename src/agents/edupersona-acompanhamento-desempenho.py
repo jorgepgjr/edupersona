@@ -348,6 +348,7 @@ async def main():
       agent.web.start(hostname="127.0.0.1", port=str(porta_inicial))
       porta_inicial += 1
       print(f"✅ {name.capitalize()} agent started")
+      print(f"🌐 Web interface started on http://127.0.0.1:{porta_inicial}/spade")
 
     print("\n" + "=" * 70)
     print("=== EDUPERSONA - SISTEMA DE ACOMPANHAMENTO DE DESEMPENHO ===")
