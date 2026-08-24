@@ -1,4 +1,4 @@
-# Edupersona
+# EDUPersona
 
 ## Sistema multiagente BDI para orientação personalizada de alunos via chat inteligente
 
@@ -8,9 +8,10 @@ O sistema oferece uma avaliação do desempenho acadêmico de alunos em uma inst
 
 O aluno interage com um chat informando sua matrícula e o que deseja, o sistema, por meio de agentes, realiza o diagnóstico do aluno e recomenda objetos de aprendizagem para o aprimoramento e evolução do aluno.
 
-O aluno também pode interagir com o chat buscando objetos de aprendizagem para adquirir materias para aprofundamento em disciplinas de seu interesse.
+O aluno também pode interagir com o chat buscando objetos de aprendizagem para adquirir materiais para aprofundamento em disciplinas de seu interesse.
 
-## Estrutura de pastas
+## Estrutura de Pastas
+
 Veja mais detalhes na [Estrutura de Pastas](Estrutura.MD).
 
 ## Ferramentas
@@ -19,78 +20,115 @@ Veja mais detalhes na [Estrutura de Pastas](Estrutura.MD).
 - Docker
 - OpenAI
 
-# Orientação da Instalação das Ferramentas
+---
 
-- Python - [Getting Started](https://www.python.org/about/gettingstarted/)
-- Docker - [Instalação do Docker](https://docs.docker.com/manuals/)
-- OpenAI - [Geração da API Key na OpenAI](https://hub.asimov.academy/tutorial/como-gerar-uma-api-key-na-openai/)
+# Instalação das Ferramentas e Pré-requisitos
 
-## Instalação do Python 3.12.10
-1. Acesse o link oficial: [Python 3.12.10](https://www.python.org/ftp/python/3.12.10/python-3.12.10-macos11.pkg)
-2. Execute o instalador `.pkg` e siga as instruções na tela.
+### macOS (Homebrew)
 
-## Instalação do Docker via Homebrew
-Abra o seu terminal e utilize o comando abaixo para instalar o Docker Desktop de forma rápida:
+- **Python**: [Getting Started](https://www.python.org/about/gettingstarted/) ou via instalador oficial macOS: [Python 3.12.10 (.pkg)](https://www.python.org/ftp/python/3.12.10/python-3.12.10-macos11.pkg)
+- **Docker**:
+  ```bash
+  brew install docker
+  ```
+
+### Windows (Ubuntu via WSL / Linux Ubuntu 24.04)
+
+Caso esteja utilizando o Windows com **WSL (Ubuntu 24.04)** ou ambiente Linux Debian/Ubuntu, instale o Python, o gerenciador de pacotes e o módulo de ambientes virtuais:
 
 ```bash
-brew install docker
+# Atualize os repositórios
+sudo apt update
+
+# Instale o Python 3, pip e o módulo de venv
+sudo apt install python3 python3-pip python3-venv -y
+
+# Instale o Docker e o plugin do Docker Compose
+sudo apt install docker.io docker-compose-v2 -y
+
+# (Opcional) Adicione seu usuário ao grupo docker para executar sem sudo:
+sudo usermod -aG docker $USER
 ```
 
+> **Nota para Windows**: Se preferir, você também pode instalar o [Docker Desktop para Windows](https://docs.docker.com/desktop/setup/install/windows-install/) integrado ao WSL2.
+
+- **OpenAI**: [Como gerar uma API Key na OpenAI](https://hub.asimov.academy/tutorial/como-gerar-uma-api-key-na-openai/)
+
+---
+
 ## Configuração da Aplicação
-1.  **Crie um ambiente virtual (venv) com Python 3.12:**
 
-    ```bash
-    python3.12 -m venv edu_env
-    ```
+1. **Crie um ambiente virtual (venv):**
 
-2.  **Ative o ambiente virtual:**
+   ```bash
+   python3 -m venv edu_env
+   ```
 
-    ```bash
-    source edu_env/bin/activate
-    ```
+2. **Ative o ambiente virtual:**
+   - No Linux / macOS / WSL:
+     ```bash
+     source edu_env/bin/activate
+     ```
+   - No Windows (PowerShell):
+     ```powershell
+     .\edu_env\Scripts\Activate.ps1
+     ```
 
-3.  **Instale as dependências:**
+3. **Instale as dependências do projeto:**
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-4.  **Adição da API Key na OpenAI na Aplicação**
+4. **Configuração da Chave da OpenAI:**
 
-    Acessar o arquivo `src/agent/edupersona-acompanhamento-desempenho.py`, procurar o trecho de código abaixo e adicionar sua chave no parâmetro `api_key`
+   Acesse o arquivo `src/agents/edupersona-acompanhamento-desempenho.py`, localize o trecho abaixo e adicione sua chave:
 
-    ```python
-    provider = LLMProvider.create_openai(
-        api_key="<OPENAI_API_KEY>",
-        model="gpt-4o-mini",
-        temperature=0.7
-    )
-    ```
+   ```python
+   provider = LLMProvider.create_openai(
+       api_key="<SUA_OPENAI_API_KEY>",
+       model="gpt-4o-mini",
+       temperature=0.7
+   )
+   ```
+
+---
 
 ## Execução
 
-Vamos usar um terminal para cada um dos passos abaixo.
+Recomenda-se utilizar um terminal dedicado para cada um dos passos a seguir:
 
-1.  **Inicie o servidor XMPP:**
+1. **Inicie o servidor XMPP:**
 
-    ```bash
-    spade run
-    ```
+   _(Certifique-se de estar com o ambiente virtual ativado)_
 
-2.  **Inicie o banco de dados:**
+   ```bash
+   spade run
+   ```
 
-    Em um novo terminal, execute:
+2. **Inicie o banco de dados via Docker:**
 
-    ```bash
-    docker compose up
-    ```
+   > **Importante:** Certifique-se de que o Docker está em execução e que o plugin `docker-compose-v2` está instalado (`sudo apt install docker-compose-v2` no Ubuntu/WSL).
 
-3.  **Execute os agentes:**
+   Em um novo terminal, suba o container do banco:
 
-    Em um novo terminal, execute:
+   ```bash
+   docker compose up
+   ```
 
-    ```bash
-    python src/agent/edupersona-acompanhamento-desempenho.py
-    ```
+   _(Caso utilize a versão legada do Compose, o comando pode ser `docker-compose up`)_.
 
-    A aplicação está executando, agora é só interagir com o chat.
+   > **Dica de Solução de Problemas:** Se o banco não inicializar ou apresentar erro de permissão no WSL/Linux:
+   >
+   > - Verifique se o daemon do Docker está rodando com `sudo service docker status` (ou inicie com `sudo service docker start`).
+   > - Se necessário, execute com permissão de superusuário: `sudo docker compose up`.
+
+3. **Execute os agentes:**
+
+   Em um novo terminal (com o `edu_env` ativado):
+
+   ```bash
+   python src/agents/edupersona-acompanhamento-desempenho.py
+   ```
+
+A aplicação estará pronta e em execução para interação via chat.
